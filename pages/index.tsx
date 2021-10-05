@@ -1,31 +1,37 @@
+import React, { useEffect, useState } from "react";
+import Head from "next/head";
+import type { NextPage } from "next";
+
+import styles from "../styles/Home.module.css";
+
+import { gql } from "graphql-request";
+import { fetcher } from "../lib/fetcher";
+
 import {
   Button,
-  Card,
-  Avatar,
   Skeleton,
   Tag,
   List,
   Typography,
   Divider,
   Modal,
+  message,
 } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
   FileAddOutlined,
 } from "@ant-design/icons";
-import type { NextPage } from "next";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import useSWR from "swr";
-import { gql } from "graphql-request";
-import { fetcher } from "../lib/fetcher";
-import React, { useState } from "react";
-import Meta from "antd/lib/card/Meta";
 
 const Home: NextPage = () => {
-  const { data, error } = useSWR(
-    [
+  const [idPost, setIdPost] = useState<number | null>(null);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [data, setData] = useState<any>([]);
+
+  const { Title } = Typography;
+
+  const getData = () => {
+    fetcher(
       gql`
         query {
           getPosts {
@@ -38,18 +44,33 @@ const Home: NextPage = () => {
           }
         }
       `,
-    ],
-    (query) => fetcher(query, {})
-  );
+      {}
+    ).then((res) => setData(res));
+  };
 
-  console.log(error);
-  console.log(data);
+  useEffect(() => {
+    getData();
+  }, []);
 
-  const { Title } = Typography;
-  const [deleteModal, setDeleteModal] = useState(false);
-
-  const showModal = () => setDeleteModal(true);
+  const showModal = (id: number) => {
+    setDeleteModal(true);
+    setIdPost(id);
+  };
   const hideModal = () => setDeleteModal(false);
+  const deletePost = () => {
+    fetcher(
+      gql`
+        mutation deletePostID($post: DeletePostInput!) {
+          deletePost(post: $post)
+        }
+      `,
+      { post: { id: idPost } }
+    ).then((res) => {
+      getData();
+      message.success(res.deletePost);
+      hideModal();
+    });
+  };
 
   return (
     <div>
@@ -76,25 +97,30 @@ const Home: NextPage = () => {
           </Button>
         </div>
         <Divider orientation="right">Read and Learn</Divider>
-        <div
-          style={{ padding: "0rem 0rem", height: "100vh", overflow: "auto" }}
-        >
+        <div style={{ height: "100vh", overflow: "auto" }}>
           <List
             itemLayout="vertical"
             size="large"
-            dataSource={data?.getPosts.reverse()}
+            dataSource={data?.getPosts?.reverse()}
             renderItem={(item: any) => (
               <List.Item
                 key={item?.title}
                 actions={
                   !!data && [
                     <>
-                      <Button icon={<EditOutlined />}>edit post</Button>
+                      <Button
+                        type="link"
+                        href={`/editPost/${item.id}`}
+                        icon={<EditOutlined />}
+                      >
+                        edit post
+                      </Button>
                     </>,
                     <>
                       <Button
                         danger
-                        icon={<DeleteOutlined onClick={showModal} />}
+                        onClick={() => showModal(item.id)}
+                        icon={<DeleteOutlined />}
                       >
                         delete post
                       </Button>
@@ -102,6 +128,7 @@ const Home: NextPage = () => {
                   ]
                 }
                 extra={
+                  // eslint-disable-next-line @next/next/no-img-element
                   !!data && <img width={272} alt="logo" src={item.image} />
                 }
               >
@@ -129,7 +156,7 @@ const Home: NextPage = () => {
         <Modal
           title="Esta seguro de eliminar este post"
           visible={deleteModal}
-          onOk={hideModal}
+          onOk={deletePost}
           onCancel={hideModal}
           okText="Eliminar"
           cancelText="Cancelar"

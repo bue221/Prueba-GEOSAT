@@ -1,12 +1,12 @@
 import { Button, Divider, Form, Input, message, Switch } from "antd";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 interface Props {
   submit: Function;
   data?: any;
 }
 
-const FormCreate: React.FC<Props> = ({ submit, data }) => {
+const FormPost: React.FC<Props> = ({ submit, data }) => {
   const [form] = Form.useForm();
 
   const onFinish = (values: any) => {
@@ -40,9 +40,13 @@ const FormCreate: React.FC<Props> = ({ submit, data }) => {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         style={{ padding: "2rem" }}
-        initialValues={{
-          published: false,
-        }}
+        initialValues={
+          data && data
+            ? { ...data }
+            : {
+                published: false,
+              }
+        }
       >
         <div style={{ overflow: "hidden" }}>
           <Form.Item name="title" label="Title" rules={[{ required: true }]}>
@@ -60,7 +64,7 @@ const FormCreate: React.FC<Props> = ({ submit, data }) => {
             label="Image"
             rules={[
               { required: true },
-              { type: "url", warningOnly: true },
+              // { type: "url", warningOnly: true },
               { type: "string", min: 6 },
             ]}
           >
@@ -73,16 +77,16 @@ const FormCreate: React.FC<Props> = ({ submit, data }) => {
           >
             <Input.TextArea rows={10} />
           </Form.Item>
-          <Form.Item name="published" label="Published">
+          <Form.Item name="published" label="Published" valuePropName="checked">
             <Switch />
           </Form.Item>
         </div>
         <Button type="primary" htmlType="submit" block>
-          Save Post
+          {data ? "Edit Post" : "Create Post"}
         </Button>
       </Form>
     </>
   );
 };
 
-export default FormCreate;
+export default FormPost;

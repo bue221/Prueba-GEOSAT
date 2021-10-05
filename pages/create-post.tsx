@@ -1,22 +1,23 @@
-import { message } from "antd";
 import Head from "next/head";
-import React from "react";
+import { useRouter } from "next/dist/client/router";
+
 import { gql } from "graphql-request";
 import { fetcher } from "../lib/fetcher";
-import { useRouter } from "next/dist/client/router";
-import FormCreate from "@/components/FormCreate";
+
+import { message } from "antd";
+import FormPost from "@/components/FormPost";
 
 const CreatePost = () => {
   const history = useRouter();
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (post: any) => {
     fetcher(
       gql`
         mutation NewConsulta($post: NewPostInput!) {
           createPost(post: $post)
         }
       `,
-      { post: values }
+      { post }
     )
       .then((res) => {
         history.push("/");
@@ -33,7 +34,7 @@ const CreatePost = () => {
         <title>Create Post</title>
       </Head>
       <main>
-        <FormCreate submit={(values: any) => onSubmit(values)} />
+        <FormPost submit={onSubmit} />
       </main>
     </>
   );
