@@ -65,10 +65,12 @@ const PostById = () => {
       </Head>
       <main>
         <Spin spinning={!data?.getPost} tip="loading">
-          <FormPost
-            data={data?.getPost}
-            submit={(values: any) => onSubmit(values)}
-          />
+          {data?.getPost && (
+            <FormPost
+              data={data?.getPost}
+              submit={(values: any) => onSubmit(values)}
+            />
+          )}
         </Spin>
       </main>
     </>

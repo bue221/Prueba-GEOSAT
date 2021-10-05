@@ -17,17 +17,17 @@ const FormPost: React.FC<Props> = ({ submit, data }) => {
     message.error("Submit failed!");
   };
 
-  useEffect(() => {
-    if (data) {
-      onFill();
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data) {
+  //     onFill();
+  //   }
+  // }, []);
 
-  const onFill = () => {
-    form.setFieldsValue({
-      ...data,
-    });
-  };
+  // const onFill = () => {
+  //   form.setFieldsValue({
+  //     ...data,
+  //   });
+  // };
 
   return (
     <>
