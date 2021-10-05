@@ -106,26 +106,28 @@ const Home: NextPage = () => {
               <List.Item
                 key={item?.title}
                 actions={
-                  !!data && [
-                    <>
-                      <Button
-                        type="link"
-                        href={`/editPost/${item.id}`}
-                        icon={<EditOutlined />}
-                      >
-                        edit post
-                      </Button>
-                    </>,
-                    <>
-                      <Button
-                        danger
-                        onClick={() => showModal(item.id)}
-                        icon={<DeleteOutlined />}
-                      >
-                        delete post
-                      </Button>
-                    </>,
-                  ]
+                  !!data
+                    ? [
+                        <>
+                          <Button
+                            type="link"
+                            href={`/editPost/${item.id}`}
+                            icon={<EditOutlined />}
+                          >
+                            edit post
+                          </Button>
+                        </>,
+                        <>
+                          <Button
+                            danger
+                            onClick={() => showModal(item.id)}
+                            icon={<DeleteOutlined />}
+                          >
+                            delete post
+                          </Button>
+                        </>,
+                      ]
+                    : []
                 }
                 extra={
                   // eslint-disable-next-line @next/next/no-img-element
